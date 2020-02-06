@@ -270,4 +270,4 @@ class NEPB_WC_Order {
 
 	
 }
-new KEP_Callbacks();
+new NEPB_WC_Order();
