@@ -13,22 +13,22 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class NEPB_Items {
 
-	public static function get_items( $product, $quantity ) {
+	public static function get_items( $product, $quantity, $country = 'SE', $postcode = null ) {
 		$items = array();
 
 		
 		$items[] = self::get_item( $product, $quantity );
 		
+		
 
-        // Get cart shipping
-        /*
-		if ( WC()->cart->needs_shipping() ) {
-			$shipping = self::get_shipping();
+        // Add shipping
+		if ( $product->needs_shipping() ) {
+			$shipping = self::get_shipping( $product, $quantity, $country, $postcode );
 			if ( null !== $shipping ) {
 				$items[] = $shipping;
 			}
 		}
-        */
+
 		return $items;
 	}
 
@@ -69,14 +69,30 @@ class NEPB_Items {
 		);
 	}
 
-	public static function get_shipping() {
+	public static function get_shipping( $product, $quantity, $country, $postcode ) {
+		
+		/*
 		WC()->cart->calculate_shipping();
 		$packages        = WC()->shipping->get_packages();
 		$chosen_methods  = WC()->session->get( 'chosen_shipping_methods' );
 		$chosen_shipping = $chosen_methods[0];
+		*/
+		$amount         = wc_get_price_including_tax( $product ) * $quantity;
+		$values         = array(
+			'country'  => $country,
+			'postcode' => $postcode,
+			'amount'   => $amount,
+		);
+		// Fake product number to get a filled card....
+		if ( method_exists( WC()->cart, 'get_cart' ) ) {
+			WC()->cart->add_to_cart( '1' );
+			WC()->shipping->calculate_shipping( self::get_shipping_packages( $values, $product ) );
+			$packages        = WC()->shipping->get_packages();
+		}
+
 		foreach ( $packages as $i => $package ) {
 			foreach ( $package['rates'] as $method ) {
-				if ( $chosen_shipping === $method->id ) {
+				//if ( $chosen_shipping === $method->id ) {
 					if ( $method->cost > 0 ) {
 						return array(
 							'reference'        => 'shipping|' . $method->id,
@@ -102,7 +118,8 @@ class NEPB_Items {
 							'netTotalAmount'   => 0,
 						);
 					}
-				}
+				//}
+				break;
 			}
 		}
 	}
@@ -115,4 +132,57 @@ class NEPB_Items {
 		}
 		return substr( $part_number, 0, 32 );
 	}
+
+
+
+	/**
+	 * Get shipping packages.
+	 *
+	 * @param array  $value Product and customer values.
+	 * @param object $product WooCommerce product.
+	 *
+	 * @return array
+	 */
+	public function get_shipping_packages( $value, $product ) {
+		// We simulate the cart structure to calculate price for packages.
+		$packages                                = array();
+		$packages[0]['contents']                 = array(
+			$product->get_id() => array(
+				'key'               => $product->get_id(),
+				'product_id'        => $product->get_id(),
+				'variation_id'      => 0,
+				'variation'         =>
+				array(),
+				'quantity'          => 1,
+				'data_hash'         => $product->get_id(),
+				'line_tax_data'     =>
+				array(
+					'subtotal' =>
+					array(
+						1 => $value['amount'],
+					),
+					'total'    =>
+					array(
+						1 => $value['amount'],
+					),
+				),
+				'line_subtotal'     => $value['amount'],
+				'line_subtotal_tax' => 0,
+				'line_total'        => $value['amount'],
+				'line_tax'          => 0,
+				'data'              => $product,
+			),
+		);
+		$packages[0]['contents_cost']            = $value['amount'];
+		$packages[0]['applied_coupons']          = WC()->session->applied_coupon;
+		$packages[0]['destination']['country']   = $value['country'];
+		$packages[0]['destination']['state']     = '';
+		$packages[0]['destination']['postcode']  = $value['postcode'];
+		$packages[0]['destination']['city']      = '';
+		$packages[0]['destination']['address']   = '';
+		$packages[0]['destination']['address_2'] = '';
+
+		return apply_filters( 'woocommerce_cart_shipping_packages', $packages );
+	}
+
 }

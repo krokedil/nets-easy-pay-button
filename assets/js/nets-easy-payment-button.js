@@ -38,7 +38,11 @@ jQuery(function($) {
 			if( nepb_params.paymentid && 'yes' === nepb_params.nepb_checkout ) {
 				modal.style.display = "block"
 				body.classList.add("nepb-modal-open")
-				nepb.getCheckoutSession( nepb_params.paymentid );
+				if( 'yes' === nepb_params.nepb_checkout_complete) {
+					nepb.getCheckoutSessionComplete( nepb_params.paymentid );
+				} else {
+					nepb.getCheckoutSession( nepb_params.paymentid );
+				}
 			}
 			
 		},
@@ -115,7 +119,10 @@ jQuery(function($) {
 							$('.nepb-checkout-modal-content').html('<div class="nets-ifame">'  + data.data.message +  '</div>');
 							// $('.nepb-new-button-modal-content').prepend('<div class="notice notice-error is-dismissible"><p><strong> ' + data.data.message + '</strong></p></div>');
 						} else {
-							sessionStorage.setItem( 'nepb_session_id', data.data.nepb_session_id );
+							if( data.data.nepb_session_id ) {
+								sessionStorage.setItem( 'nepb_session_id', data.data.nepb_session_id );
+							}
+							
 							// $('.kis-submit').removeClass('disabled');
 							// $('.nepb-checkout-modal-content').html('<div class="nets-ifame">'  + data.data.nepb_session_id +  '<div id="dibs-complete-checkout"></div></div>');
 							$('.nepb-checkout-modal-content').html('<div class="nets-ifame"><div id="dibs-complete-checkout"></div></div>');
@@ -164,6 +171,58 @@ jQuery(function($) {
 					}
 				}
 			);
+		},
+
+
+		/*
+		 * For regular products.
+		 * Updates the customer address in WooCommerce if customer country in KIS modal is different from Woo.
+		 * This function is run on Klarna JS callback events session_initiated & identification_updated.
+		 */
+		getCheckoutSessionComplete: function( paymentid = null ){
+			
+			console.log('getCheckoutSessionComplete');
+			// console.log(buttonEnvironment);
+			if( paymentid ) {
+				var nepbSessionId = paymentid;
+			} else {
+				if (sessionStorage.getItem('nepb_session_id')) {
+					var nepbSessionId = sessionStorage.getItem('nepb_session_id');
+				} else {
+					var nepbSessionId = '';
+				}
+			}
+			$('.nepb-checkout-modal-content').html('<div class="nets-ifame"><div id="dibs-complete-checkout"></div></div>');
+			
+			var checkoutOptions = {
+				checkoutKey: nepb_params.private_key, 	//[Required] Test or Live GUID with dashes
+				paymentId : nepbSessionId, 		//[required] GUID without dashes
+				containerId : "dibs-complete-checkout", 		//[optional] defaultValue: dibs-checkout-content
+				language: nepb_params.locale,            //[optional] defaultValue: en-GB
+			};
+			var dibsCheckout = new Dibs.Checkout(checkoutOptions);
+			dibsCheckout.on('pay-initialized', function(response) {
+				console.log('nets pay-initialized');
+				// nepb.onPaymentInitiated( response );
+				console.log('response');
+				console.log(response);
+				$(document.body).trigger('dibs_pay_initialized');
+				console.log('dibs_pay_initialized');
+				
+				nepb.processWooOrder(response, dibsCheckout);	
+				
+				
+			});
+			dibsCheckout.on('payment-completed', function (response) {
+				console.log('payment-completed');
+				console.log(response.paymentId);
+				//DIBS_Payment_Success(response.paymentId);
+				var redirectUrl = sessionStorage.getItem( 'nepbRedirectUrl' );
+				console.log(redirectUrl);
+				if( redirectUrl ) {
+					window.location.href = redirectUrl;
+				}
+			});
 		},
 
 		/*

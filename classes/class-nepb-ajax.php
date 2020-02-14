@@ -40,7 +40,6 @@ class NEPB_Ajax extends WC_AJAX {
 		// Nonce check.
 		// check_ajax_referer( 'kiswp-admin', 'security' );
 		if ( isset( $_POST['nepb_session_id'] ) && ! empty( $_POST['nepb_session_id'] ) ) {
-
 			$request = new DIBS_Requests_Update_DIBS_Order( $_POST['nepb_session_id'] );
 			
 			$request = $request->request();

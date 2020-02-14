@@ -67,13 +67,20 @@ class NEPB_Shortcode {
 			$nepb_checkout = null;
 		}
 
+		if ( isset( $_GET['nepb_checkout'] ) && 'yes' === $_GET['nepb_checkout'] && isset( $_GET['paymentid'] ) && ! isset( $_GET['paymentFailed'] ) ) {
+			$nepb_checkout_complete = 'yes';
+		} else {
+			$nepb_checkout_complete = 'no';
+		}
+
 		$params = array(
 			'ajax_url'                    => admin_url( 'admin-ajax.php' ),
 			'current_url'                 => get_permalink(),
 			'private_key'                 => wc_dibs_get_private_key(),
 			'locale'                      => wc_dibs_get_locale(),
-			'paymentid'                      => $paymentid,
-			'nepb_checkout'                      => $nepb_checkout,
+			'paymentid'						=> $paymentid,
+			'nepb_checkout'					=> $nepb_checkout,
+			'nepb_checkout_complete'		=> $nepb_checkout_complete,
 			'get_checkout_session_url'    => WC_AJAX::get_endpoint( 'get_checkout_session' ),
 			'customer_adress_updated_url' => WC_AJAX::get_endpoint( 'customer_adress_updated' ),
 			'process_woo_order_url' => WC_AJAX::get_endpoint( 'process_woo_order' ),
@@ -143,7 +150,6 @@ class NEPB_Shortcode {
 		if ( isset( $_POST['action'] ) && 'nepb_get_checkout_session' === $_POST['action'] ) {
 			$product  = ( wc_get_product( esc_attr( wp_unslash( $_POST['product_id'] ) ) ) );
 			$quantity = intval( esc_attr( wp_unslash( $_POST['quantity'] ) ) );
-			$price_incl_tax        = intval( round( wc_get_price_including_tax( $product ) * 100, 2 ) );
 
 			if ( $product ) {
 				$current_url      = $_POST['current_url'];
@@ -164,10 +170,14 @@ class NEPB_Shortcode {
 
 				unset( $request_args['order'] );
 				
-
+				$amount = 0;
+				$items = NEPB_Items::get_items( $product, $quantity, $this->get_purchase_country() );
+				foreach ( $items as $item ) {
+					$amount += $item['grossTotalAmount']; 
+				}
 				$request_args['order'] = [
-					'amount'    => $price_incl_tax * $quantity,
-					'items'		=> NEPB_Items::get_items( $product, $quantity ),
+					'amount'    => $amount,
+					'items'		=> $items,
 					'currency'  => get_woocommerce_currency(),
 					'shipping'  => [
 						[
@@ -202,13 +212,16 @@ class NEPB_Shortcode {
 		if ( isset( $_POST['action'] ) && 'nepb_get_checkout_session' === $_POST['action'] ) {
 			$product  = ( wc_get_product( esc_attr( wp_unslash( $_POST['product_id'] ) ) ) );
 			$quantity = intval( esc_attr( wp_unslash( $_POST['quantity'] ) ) );
-			$price_incl_tax        = intval( round( wc_get_price_including_tax( $product ) * 100, 2 ) );
-
+			$amount = 0;
+			$items = NEPB_Items::get_items( $product, $quantity, $this->get_purchase_country() );
+			foreach ( $items as $item ) {
+				$amount += $item['grossTotalAmount']; 
+			}
 			if ( $product ) {
 
 				$request_args = [
-					'amount'    => $price_incl_tax * $quantity,
-					'items'		=> NEPB_Items::get_items( $product, $quantity ),
+					'amount'    => $amount,
+					'items'		=> $items,
 					'currency'  => get_woocommerce_currency(),
 					'shipping'  => [
 						'costSpecified' => false,
@@ -219,6 +232,23 @@ class NEPB_Shortcode {
 			}
 		}
 		return $request_args;
+	}
+
+	/**
+	 * Gets country for Klarna purchase.
+	 *
+	 * @return string
+	 */
+	public function get_purchase_country() {
+		// Try to use customer country if available.
+		if ( ! empty( WC()->customer->get_billing_country() ) && strlen( WC()->customer->get_billing_country() ) === 2 ) {
+			return WC()->customer->get_billing_country( 'edit' );
+		}
+
+		$base_location = wc_get_base_location();
+		$country       = $base_location['country'];
+
+		return $country;
 	}
 
 }
