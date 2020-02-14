@@ -34,11 +34,11 @@ class NEPB_Items {
 
 	public static function get_item( $product, $quantity ) {
 
-        $country               = Krokedil_Easy_Payments()->helper->get_customer_country();
+        $country               = NEPB()->helper->get_customer_country();
         $price_incl_tax        = intval( round( wc_get_price_including_tax( $product ) * 100, 2 ) );
         $price_excl_tax        = intval( round( wc_get_price_excluding_tax( $product ) * 100, 2 ) );
         $tax_amount            = $price_incl_tax - $price_excl_tax;
-        $tax_rate              = Krokedil_Easy_Payments()->helper->get_item_tax_rate( $product );
+        $tax_rate              = NEPB()->helper->get_item_tax_rate( $product );
         $wc_prices_include_tax = ( true === wc_prices_include_tax() ) ? 'yes' : 'no';
         $sku                   = empty( $product->get_sku() ) ? $product->get_id() : $product->get_sku();
 
