@@ -29,13 +29,13 @@ class NEPB_WC_Order {
 
 
 	/**
-	 * Handles WooCommerce checkout error, after Klarna order has already been created.
+	 * Create the order in WooCommerce and return the result.
 	 */
 	public static function create_nepb_order(  $nets_payment_id, $product_id, $quantity ) {
 		if ( ! empty( $nets_payment_id ) ) {
 			$result = array();
 			
-			// Check if Woo order with Klarna order ID already exist.
+			// Check if Woo order with Nets payment ID already exist.
 			$query_args = array(
 				'fields'      => 'ids',
 				'post_type'   => wc_get_order_types(),
@@ -56,8 +56,8 @@ class NEPB_WC_Order {
 
 					if ( is_object( $order ) ) {
 
-                        /* translators: %s: Klarna order ID */
-						$note = sprintf( __( 'Payment via Nets Easy Payment Button. Nets payment ID: %s', 'klarna-instant-shopping-for-wordpress' ), sanitize_key( $nets_payment_id ) );
+                        /* translators: %s: Nets payment ID */
+						$note = sprintf( __( 'Payment via Nets Easy Payment Button. Nets payment ID: %s', 'nets-easy-pay-button' ), sanitize_key( $nets_payment_id ) );
                         $order->add_order_note( $note );
                         $result['redirect'] = $order->get_checkout_order_received_url();
 						$result['result'] = 'success';
@@ -96,7 +96,7 @@ class NEPB_WC_Order {
 	/**
 	 * Create WooCommerce order.
 	 *
-	 * @param object $klarna_order Order data returned from Klarna.
+	 * @param object $nets_order Order data returned from Nets.
 	 *
 	 * @return object
 	 */
@@ -150,7 +150,7 @@ class NEPB_WC_Order {
 	/**
 	 * Process Woocommerce order lines.
 	 *
-	 * @param object $klarna_order Order data returned from Klarna.
+	 * @param object $nets_order Order data returned from Nets.
 	 * @param object $order WooCommerce order.
 	 *
 	 * @return void
@@ -236,9 +236,9 @@ class NEPB_WC_Order {
 
 	
 	/**
-	 * Get customer address formatted for WooCommerce from Klarna order.
+	 * Get customer address formatted for WooCommerce from Nets order.
 	 *
-	 * @param object $klarna_order Order data returned from Klarna.
+	 * @param object $nets_order Order data returned from Nets.
 	 *
 	 * @return array
 	 */

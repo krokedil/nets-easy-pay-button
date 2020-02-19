@@ -125,57 +125,6 @@ class NEPB_Helper {
 		return apply_filters( 'woocommerce_cart_shipping_packages', $packages );
 	}
 
-	/**
-	 * Gets shipping countries formatted for Klarna.
-	 *
-	 * @return array
-	 */
-	public function get_shipping_countries() {
-		$wc_countries = new WC_Countries();
-		return implode( '","', array_keys( $wc_countries->get_shipping_countries() ) );
-	}
-
-	/**
-	 * Get shipping methods formatted for Klarna.
-	 *
-	 * @param object $product WooCommerce product.
-	 * @param string $country Customer country.
-	 * @param string $postcode Customer postcode.
-	 *
-	 * @return array
-	 */
-	public function get_shipping_methods_for_klarna( $product, $country, $postcode = null ) {
-		$lowest_cost      = 999999999;
-		$selected_index   = 0;
-		$shipping_methods = array();
-		$tax_rate         = $this->get_item_tax_rate( $product );
-
-		foreach ( $this->get_shipping_methods_for_product( $product, $country, $postcode ) as $key => $methods ) {
-			$shipping_price_in_cents = $methods['price'] * 100;
-			NEPB()->logger->log( 'Shipping in cents price is ' . $shipping_price_in_cents );
-			if ( $shipping_price_in_cents < $lowest_cost ) {
-				$lowest_cost    = $shipping_price_in_cents;
-				$selected_index = $key;
-			}
-			$price_excl_tax     = $shipping_price_in_cents;
-			$price_incl_tax     = intval( $shipping_price_in_cents * ( 1 + ( $tax_rate / 10000 ) ) );
-			$tax_amount         = $price_incl_tax - $price_excl_tax;
-			$shipping_methods[] = array(
-				'id'              => $methods['type'] . ':' . $methods['id'],
-				'name'            => $methods['name'],
-				'description'     => '',
-				'price'           => $price_incl_tax,
-				'tax_amount'      => $tax_amount,
-				'tax_rate'        => $tax_rate,
-				'preselected'     => false,
-				'shipping_method' => 'PickUpPoint',
-			);
-		};
-		NEPB()->logger->log( 'Lowest shipping was ' . $lowest_cost . ' for index ' . $selected_index );
-		$shipping_methods[ $selected_index ]['preselected'] = true;
-		NEPB()->logger->log( 'Shipping: methods: ' . wp_json_encode( $shipping_methods ) );
-		return $shipping_methods;
-	}
 
 	/**
 	 * Get product item tax rate.
@@ -202,7 +151,7 @@ class NEPB_Helper {
 	}
 
 	/**
-	 * Gets Klarna payment method.
+	 * Gets payment method.
 	 *
 	 * @return string
 	 */
@@ -210,7 +159,7 @@ class NEPB_Helper {
 		return $this->payment_method;
 	}
 	/**
-	 * Gets Klarna payment method title.
+	 * Gets payment method title.
 	 *
 	 * @return string
 	 */
@@ -219,7 +168,7 @@ class NEPB_Helper {
 	}
 
 	/**
-	 * Gets Klarna testmode.
+	 * Gets testmode.
 	 *
 	 * @return string
 	 */

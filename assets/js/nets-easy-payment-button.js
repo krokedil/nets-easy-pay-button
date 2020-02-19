@@ -55,21 +55,10 @@ jQuery(function($) {
 		},
 
 		/*
-		 * For regular products.
-		 * Updates the customer address in WooCommerce if customer country in KIS modal is different from Woo.
-		 * This function is run on Klarna JS callback events session_initiated & identification_updated.
+		 * Get checkout session.
+		 * Fetches the Nets iframe via an ajax request.
 		 */
 		getCheckoutSession: function( paymentid = null ){
-			// e.preventDefault();
-			// $('.kis-submit').addClass('disabled kis-spinner');
-			//const buttonIdData = $(this).attr("data-id");
-			//const buttonMerchantId = $(this).attr("data-merchant-id");
-			//const buttonSharedSecret = $(this).attr("data-shared-secret");
-			
-			// const buttonMerchantId = $('input[name=merchant-id]').val();
-			// const buttonSharedSecret = $('input[name=shared-secret]').val();
-			// const buttonEnvironment = $('input[name=environment]:checked').val();
-			// const buttonCountries = $('select[name=countries]').val();
 			console.log('getCheckoutSession');
 			// console.log(buttonEnvironment);
 			if( paymentid ) {
@@ -166,8 +155,6 @@ jQuery(function($) {
 						$('.nepb-checkout-modal-content').html('<div class="nets-ifame">'  + data.statusText +  '</div>');
 					},
 					complete: function(data) {
-						// Update Klarna order.
-						
 					}
 				}
 			);
@@ -175,9 +162,8 @@ jQuery(function($) {
 
 
 		/*
-		 * For regular products.
-		 * Updates the customer address in WooCommerce if customer country in KIS modal is different from Woo.
-		 * This function is run on Klarna JS callback events session_initiated & identification_updated.
+		 * Get checkout session complete.
+		 * Used to get the Nets checkout when redirected back from 3DSecure. No checkout update needed then.
 		 */
 		getCheckoutSessionComplete: function( paymentid = null ){
 			
@@ -226,21 +212,10 @@ jQuery(function($) {
 		},
 
 		/*
-		 * For regular products.
-		 * Updates the customer address in WooCommerce if customer country in KIS modal is different from Woo.
-		 * This function is run on Klarna JS callback events session_initiated & identification_updated.
+		 * Create an order in WooCommerce.
+		 * Triggered by the pay-initialized JS event.
 		 */
 		processWooOrder: function( response, dibsCheckout ){
-			// e.preventDefault();
-			// $('.kis-submit').addClass('disabled kis-spinner');
-			//const buttonIdData = $(this).attr("data-id");
-			//const buttonMerchantId = $(this).attr("data-merchant-id");
-			//const buttonSharedSecret = $(this).attr("data-shared-secret");
-			
-			// const buttonMerchantId = $('input[name=merchant-id]').val();
-			// const buttonSharedSecret = $('input[name=shared-secret]').val();
-			// const buttonEnvironment = $('input[name=environment]:checked').val();
-			// const buttonCountries = $('select[name=countries]').val();
 
 			const nepbCheckout = document.querySelector('#nepb-checkout-button');
 
@@ -286,8 +261,6 @@ jQuery(function($) {
 						return 'error';
 					},
 					complete: function(data) {
-						// Update Klarna order.
-						
 					}
 				}
 			);

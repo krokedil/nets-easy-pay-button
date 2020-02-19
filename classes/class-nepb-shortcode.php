@@ -140,9 +140,9 @@ class NEPB_Shortcode {
 	}
 
 	/**
-	 * Marks the order as a recurring order for Klarna
+	 * Nets order create args.
 	 *
-	 * @param array $request_args The Klarna request arguments.
+	 * @param array $request_args The Nets request arguments.
 	 * @return array
 	 */
 	public function nepb_create_order_args( $request_args ) {
@@ -165,8 +165,6 @@ class NEPB_Shortcode {
 					),
 					$current_url
 				);
-
-				
 
 				unset( $request_args['order'] );
 				
@@ -202,9 +200,9 @@ class NEPB_Shortcode {
 	}
 
 	/**
-	 * Marks the order as a recurring order for Klarna
+	 * Nets order update args.
 	 *
-	 * @param array $request_args The Klarna request arguments.
+	 * @param array $request_args The Nets request arguments.
 	 * @return array
 	 */
 	public function nepb_update_order_args( $request_args ) {
@@ -235,7 +233,7 @@ class NEPB_Shortcode {
 	}
 
 	/**
-	 * Gets country for Klarna purchase.
+	 * Gets country for Nets purchase.
 	 *
 	 * @return string
 	 */

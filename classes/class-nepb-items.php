@@ -143,7 +143,7 @@ class NEPB_Items {
 	 *
 	 * @return array
 	 */
-	public function get_shipping_packages( $value, $product ) {
+	public static function get_shipping_packages( $value, $product ) {
 		// We simulate the cart structure to calculate price for packages.
 		$packages                                = array();
 		$packages[0]['contents']                 = array(
