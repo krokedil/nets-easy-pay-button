@@ -2,7 +2,7 @@
 /*
  * Plugin Name: Nets Easy Pay Button
  * Plugin URI: https://krokedil.com
- * Description:
+ * Description: Adds a payment button directly on product pages or via shortcode.
  * Version: 0.1.0
  * Author: Krokedil
  * Author URI: https://krokedil.com
@@ -39,7 +39,7 @@ if ( ! class_exists( 'Nets_Easy_Pay_Button' ) ) {
 		public function __construct() {
 			// Initiate the plugin.
 			add_action( 'plugins_loaded', array( $this, 'init' ), 1000 );
-			// add_action( 'plugins_loaded', array( $this, 'check_version' ) );
+			add_action( 'plugins_loaded', array( $this, 'check_version' ) );
 		}
 		/**
 		 * Returns the *Singleton* instance of this class.
@@ -149,10 +149,10 @@ if ( ! class_exists( 'Nets_Easy_Pay_Button' ) ) {
 		 */
 		public function check_version() {
 			require NEPB_PLUGIN_PATH . '/includes/plugin_update_check.php';
-			$KernlUpdater = new PluginUpdateChecker_2_0(
-				'https://kernl.us/api/v1/updates/5cf6777bb9d21704d128a287/',
+			$KernlUpdater = new PluginUpdateChecker_2_0 (
+				'https://kernl.us/api/v1/updates/5e609f2e61ed601988fa2599/',
 				__FILE__,
-				'klarna-instant-shopping-for-wordpress',
+				'nets-easy-pay-button',
 				1
 			);
 		}
