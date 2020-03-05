@@ -45,3 +45,12 @@ At the moment this feature is not available for variable products.
 * This is a plugin that is currently in beta mode. It is primary recommended for testing.
 * Nets Easy Pay Button is currently only available to customers from the same country as the store base country. We are working on multi country support.
 * Postal number based shipping cost is currently not supported in the plugin.
+
+
+== CHANGELOG ==
+
+= 2020.03.05        - version 0.2.0 =
+* Enhancement       - Added links to documentation.
+
+= 2020.03.05        - version 0.1.0 =
+* Initial release.

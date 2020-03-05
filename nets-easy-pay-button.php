@@ -3,7 +3,7 @@
  * Plugin Name: Nets Easy Pay Button
  * Plugin URI: https://krokedil.com
  * Description: Adds a payment button directly on product pages or via shortcode.
- * Version: 0.1.0
+ * Version: 0.2.0
  * Author: Krokedil
  * Author URI: https://krokedil.com
  * Text Domain: nets-easy-pay-button
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'NEPB_VERSION', '0.1.0' );
+define( 'NEPB_VERSION', '0.2.0' );
 define( 'NEPB_MAIN_FILE', __FILE__ );
 define( 'NEPB_PLUGIN_PATH', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
 define( 'NEPB_PLUGIN_URL', untrailingslashit( plugin_dir_url( __FILE__ ) ) );
@@ -77,21 +77,20 @@ if ( ! class_exists( 'Nets_Easy_Pay_Button' ) ) {
 		 */
 		public function init() {
 			load_plugin_textdomain( 'nets-easy-pay-button', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
+
 			// Only run if WooCommerce and Nets Easy is activated.
 			if ( ! class_exists( 'WC_Payment_Gateway' ) || ! class_exists( 'DIBS_Easy' ) ) {
 				return;
 			}
 
 			$this->include_files();
+
 			// Load scripts.
 			add_action( 'wp_enqueue_scripts', array( $this, 'load_scripts' ) );
-			// add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_scripts' ) );
-			// Set variabled for shorthand access to classes.
-			// $this->options_page       = new KISWP_Options_Page();
-			// $this->settings           = new KISWP_Settings();
-			// $this->woocommerce_button = new KISWP_WooCommerce_Button();
-			// $this->requests           = new KISWP_Requests();
-			// $this->api_callbacks      = new KISWP_Api_Callbacks();
+
+			// Add info to plugin page.
+			add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( $this, 'plugin_action_links' ) );
+
 			$this->logger = new NEPB_Logging();
 			$this->helper = new NEPB_Helper();
 		}
@@ -115,7 +114,6 @@ if ( ! class_exists( 'Nets_Easy_Pay_Button' ) ) {
 			include_once NEPB_PLUGIN_PATH . '/classes/class-nepb-helper.php';
 			include_once NEPB_PLUGIN_PATH . '/classes/class-nepb-items.php';
 		}
-
 
 		/**
 		 * Loads the needed scripts for PaysonCheckout.
@@ -141,7 +139,6 @@ if ( ! class_exists( 'Nets_Easy_Pay_Button' ) ) {
 			}
 		}
 
-
 		/**
 		 * Checks the plugin version.
 		 *
@@ -155,6 +152,21 @@ if ( ! class_exists( 'Nets_Easy_Pay_Button' ) ) {
 				'nets-easy-pay-button',
 				1
 			);
+		}
+
+		/**
+		 * Adds plugin action links
+		 *
+		 * @since 1.0.4
+		 */
+		public function plugin_action_links( $links ) {
+
+			$plugin_links = array(
+				'<a href="' . admin_url( 'admin.php?page=wc-settings&tab=checkout&section=dibs_easy' ) . '">' . __( 'Settings', 'dibs-easy-for-woocommerce' ) . '</a>',
+				'<a href="https://docs.krokedil.com/article/333-nets-easy-pay-button">' . __( 'Docs', 'dibs-easy-for-woocommerce' ) . '</a>',
+				'<a href="https://krokedil.se/support/">' . __( 'Support', 'dibs-easy-for-woocommerce' ) . '</a>',
+			);
+			return array_merge( $plugin_links, $links );
 		}
 	}
 	Nets_Easy_Pay_Button::get_instance();
