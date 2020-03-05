@@ -1,0 +1,13 @@
+{
+    "0.1.0" : {
+          "description" : "<ul><li>Initial release.</li></ul>",
+          "requires" : "4.7.0",
+          "tested" : "5.3.0",
+          "upgrade_notice" : "Initial release."
+    },
+    "0.2.0" : {
+        "description" : "<ul><li>Enhancement - Plugin document link.</li></ul>",
+        "requires" : "4.7.0",
+        "tested" : "5.3.0"
+   }
+}
