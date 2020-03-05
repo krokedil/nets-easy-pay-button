@@ -267,7 +267,6 @@ class NEPB_WC_Order {
         }
 		return $adress;
 	}
-
 	
 }
 new NEPB_WC_Order();

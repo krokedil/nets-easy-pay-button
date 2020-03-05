@@ -24,10 +24,12 @@ jQuery(function($) {
 			}
 			closeBtn.onclick = function(){
 				modal.style.display = "none"
+				body.classList.remove("nepb-modal-open")
 			}
 			window.onclick = function(e){
 			if(e.target == modal){
 				modal.style.display = "none"
+				body.classList.remove("nepb-modal-open")
 			}
 			}
 		},
@@ -105,7 +107,7 @@ jQuery(function($) {
 						console.log(data.data.result);
 						if('error' === data.data.result) {
 							// $('.kis-submit').removeClass('disabled');
-							$('.nepb-checkout-modal-content').html('<div class="nets-ifame">'  + data.data.message +  '</div>');
+							$('.nepb-checkout-modal-content').html('<div class="nets-ifame nepb-fade-in">'  + data.data.message +  '</div>');
 							// $('.nepb-new-button-modal-content').prepend('<div class="notice notice-error is-dismissible"><p><strong> ' + data.data.message + '</strong></p></div>');
 						} else {
 							if( data.data.nepb_session_id ) {

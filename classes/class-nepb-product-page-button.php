@@ -1,6 +1,6 @@
 <?php
 /**
- * WooCommerce shortcode button class file.
+ * WooCommerce product page button class file.
  *
  * @package NEPB/Classes
  */
@@ -11,19 +11,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * WooCommerce product page button class.
  */
-class NEPB_Shortcode {
+class NEPB_Product_Page_Button {
 
 	/**
 	 * Class constructor.
 	 */
 	public function __construct() {
 		$this->dibs_settings = get_option( 'woocommerce_dibs_easy_settings' );
-		add_shortcode( 'easy_payment_button', array( $this, 'init_and_render_button' ) );
-		add_filter( 'dibs_easy_create_order_args', array( $this, 'nepb_create_order_args' ) );
-		add_filter( 'dibs_easy_update_order_args', array( $this, 'nepb_update_order_args' ) );
-		
-		add_action( 'woocommerce_thankyou_dibs_easy', array( $this, 'reset_nepb_session' ) );
+		add_action( 'woocommerce_before_add_to_cart_form', array( $this, 'init_and_render_button' ) );
 	}
+
 
 	public function reset_nepb_session() {
 
@@ -33,26 +30,12 @@ class NEPB_Shortcode {
 	}
 
 	/**
-	 * Init and render KIS button.
+	 * Init and render Nets button.
 	 *
-	 * @param array $atts Shortcode attributes.
-	 *
-	 * @return string Shortcode output.
+	 * @return string button output.
 	 */
-	public function init_and_render_button( $atts ) {
-
-		// Default attributes.
-		$atts = shortcode_atts(
-			array(
-				'instance-id'    => 'nepb-shortcode-1',
-				'wc-product-id'  => '',
-				'button-label'   => 'Buy now',
-				'quantity-field' => '',
-			),
-			$atts,
-			'net_easy_payment_button'
-		);
-
+	public function init_and_render_button() {
+        
 		if ( isset( $_GET['paymentid'] ) ) {
 			$paymentid = $_GET['paymentid'];
 		} elseif ( isset( $_GET['paymentId'] ) ) { 
@@ -97,9 +80,13 @@ class NEPB_Shortcode {
 		$script_url = $testmode ? 'https://test.checkout.dibspayment.eu/v1/checkout.js?v=1' : 'https://checkout.dibspayment.eu/v1/checkout.js?v=1';
 		wp_enqueue_script( 'dibs-script', $script_url, array( 'jquery' ) );
 
-		ob_start();
-		$this->render_button( $atts );
-		return ob_get_clean();
+        $atts = array(
+            'instance-id' => 'nepb-pp-1',
+            'button-label' => __( 'Quick checkout', 'nets-easy-pay-button' ),
+        );
+		// ob_start();
+		echo $this->render_button( $atts );
+		// return ob_get_clean();
 
 	}
 
@@ -109,6 +96,8 @@ class NEPB_Shortcode {
 	 * @param string $instance_id The html tag instance ID.
 	 */
 	public function render_button( $atts ) {
+
+        global $product;
 		?>
 		<div id="nepb-checkout">
 			<?php
@@ -124,7 +113,7 @@ class NEPB_Shortcode {
 			}
 			?>
 			<div id="nepb-checkout-button" class="button" 
-			data-wc-product-id="<?php esc_attr_e( $atts['wc-product-id'] ); ?>" 
+			data-wc-product-id="<?php esc_attr_e( $product->get_id() ); ?>" 
 			data-instance-id="<?php esc_attr_e( $atts['instance-id'] ); ?>">
 			<?php esc_attr_e( $atts['button-label'] ); ?>
 			</div>
@@ -251,4 +240,4 @@ class NEPB_Shortcode {
 
 }
 
-new NEPB_Shortcode();
+new NEPB_Product_Page_Button();

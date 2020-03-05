@@ -106,6 +106,7 @@ if ( ! class_exists( 'Nets_Easy_Pay_Button' ) ) {
 
 			include_once NEPB_PLUGIN_PATH . '/classes/class-nepb-callbacks.php';
 			include_once NEPB_PLUGIN_PATH . '/classes/class-nepb-shortcode.php';
+			include_once NEPB_PLUGIN_PATH . '/classes/class-nepb-product-page-button.php';
 
 			include_once NEPB_PLUGIN_PATH . '/classes/class-nepb-ajax.php';
 
@@ -120,7 +121,7 @@ if ( ! class_exists( 'Nets_Easy_Pay_Button' ) ) {
 		 */
 		public function load_scripts() {
 			global $post;
-			if ( ( isset( $post ) && has_shortcode( $post->post_content, 'easy_payment_button' ) ) ) {
+			if ( is_product() || ( isset( $post ) && has_shortcode( $post->post_content, 'easy_payment_button' ) ) ) {
 				// Checkout script.
 				wp_register_script(
 					'net_easy_payment_button',
