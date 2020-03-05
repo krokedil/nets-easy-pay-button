@@ -18,9 +18,19 @@ class NEPB_Product_Page_Button {
 	 */
 	public function __construct() {
 		$this->dibs_settings = get_option( 'woocommerce_dibs_easy_settings' );
-		add_action( 'woocommerce_before_add_to_cart_form', array( $this, 'init_and_render_button' ) );
+		add_action( 'wp_head', array( $this, 'init_class' ) );
 	}
 
+	/**
+	 * Initiates the class
+	 *
+	 * @return void
+	 */
+	public function init_class() {
+		$target   = apply_filters( 'nepb_product_page_target', 'woocommerce_single_product_summary' );
+		$priority = apply_filters( 'nepb_product_page_priority', ( isset( $this->dibs_settings['nepb_product_page_location'] ) ? $this->dibs_settings['nepb_product_page_location'] : '25' ) );
+		add_action( $target, array( $this, 'init_and_render_button' ), $priority );
+	}
 
 	public function reset_nepb_session() {
 
@@ -35,6 +45,18 @@ class NEPB_Product_Page_Button {
 	 * @return string button output.
 	 */
 	public function init_and_render_button() {
+
+		global $product;
+
+		// Bail if WC product page display is set to no.
+		if ( 'no' === NEPB()->helper->get_wc_product_page_display() ) {
+			return;
+		}
+		
+		// Don't display the button if this is a variable product. We don't have support for this yet.
+		if( $product->is_type( 'variable' ) ) {
+			return;
+		}
         
 		if ( isset( $_GET['paymentid'] ) ) {
 			$paymentid = $_GET['paymentid'];
@@ -85,7 +107,7 @@ class NEPB_Product_Page_Button {
             'button-label' => __( 'Quick checkout', 'nets-easy-pay-button' ),
         );
 		// ob_start();
-		echo $this->render_button( $atts );
+		echo $this->render_button( $atts, $product );
 		// return ob_get_clean();
 
 	}
@@ -95,9 +117,8 @@ class NEPB_Product_Page_Button {
 	 *
 	 * @param string $instance_id The html tag instance ID.
 	 */
-	public function render_button( $atts ) {
+	public function render_button( $atts, $product ) {
 
-        global $product;
 		?>
 		<div id="nepb-checkout">
 			<?php
@@ -228,7 +249,7 @@ class NEPB_Product_Page_Button {
 	 */
 	public function get_purchase_country() {
 		// Try to use customer country if available.
-		if ( ! empty( WC()->customer->get_billing_country() ) && strlen( WC()->customer->get_billing_country() ) === 2 ) {
+		if ( method_exists( WC()->customer, 'get_billing_country' ) && ! empty( WC()->customer->get_billing_country() ) && strlen( WC()->customer->get_billing_country() ) === 2 ) {
 			return WC()->customer->get_billing_country( 'edit' );
 		}
 

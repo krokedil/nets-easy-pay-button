@@ -103,6 +103,7 @@ if ( ! class_exists( 'Nets_Easy_Pay_Button' ) ) {
 		 */
 		public function include_files() {
 			include_once NEPB_PLUGIN_PATH . '/classes/class-nepb-logging.php';
+			include_once NEPB_PLUGIN_PATH . '/classes/class-nepb-settings.php';
 
 			include_once NEPB_PLUGIN_PATH . '/classes/class-nepb-callbacks.php';
 			include_once NEPB_PLUGIN_PATH . '/classes/class-nepb-shortcode.php';

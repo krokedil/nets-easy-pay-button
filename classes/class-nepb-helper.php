@@ -16,10 +16,11 @@ class NEPB_Helper {
 	 * Class constructor.
 	 */
 	public function __construct() {
-		$this->nets_easy_settings         = get_option( 'woocommerce_dibs_easy_settings' );
-		$this->payment_method       = 'dibs_easy';
-		$this->payment_method_title = $this->nets_easy_settings['title'];
-		$this->testmode             = $this->nets_easy_settings['test_mode'];
+		$this->nets_easy_settings      = get_option( 'woocommerce_dibs_easy_settings' );
+		$this->payment_method          = 'dibs_easy';
+		$this->payment_method_title    = $this->nets_easy_settings['title'];
+		$this->testmode                = $this->nets_easy_settings['test_mode'];
+		$this->wc_product_page_display = ( isset( $this->nets_easy_settings['nepb_product_page_display'] ) ) ? $this->nets_easy_settings['nepb_product_page_display'] : 'no';
 	}
 
 	/**
@@ -174,5 +175,15 @@ class NEPB_Helper {
 	 */
 	public function get_testmode() {
 		return $this->testmode;
+	}
+
+	/**
+	 * Gets WooCommerce Product Page Display.
+	 * Wether or not to displey the button on product pages.
+	 *
+	 * @return string
+	 */
+	public function get_wc_product_page_display() {
+		return $this->wc_product_page_display;
 	}
 }
