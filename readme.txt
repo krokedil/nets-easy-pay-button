@@ -3,7 +3,7 @@ Contributors: krokedil
 Tags: woocommerce, krokedil, ecommerce, e-commerce, nets
 Requires at least: 5.0.0
 Tested up to: 5.3.2
-Requires PHP: 5.6
+Requires PHP: 7.0
 WC requires at least: 3.5.0
 WC tested up to: 3.9.2
 Stable tag: trunk
